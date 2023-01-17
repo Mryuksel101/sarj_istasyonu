@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -40,14 +41,36 @@ class _HaritaState extends State<Harita> {
     debugPrint("harita yüklendi");
     return Scaffold(
       
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kLake,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+      body: Stack(
 
-        
+        children: [
+
+          
+          GoogleMap(
+            mapType: MapType.normal,
+            initialCameraPosition: _kLake,
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
+      
+          
+          ),
+
+          SafeArea(
+            child: Padding(
+              
+              padding: const EdgeInsets.all(8.0),
+              child: CupertinoTextField(
+                placeholder: "Ara...",
+                prefix: Icon(
+                  CupertinoIcons.search,
+                  color: CupertinoColors.systemGrey,
+                ),
+                
+              ),
+            ),
+          )
+        ],
       ),
       
 
