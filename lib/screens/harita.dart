@@ -20,14 +20,48 @@ class _HaritaState extends State<Harita> {
   }
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  
+
+  Set<Marker> isaretler(){
+    return <Marker>{
+       Marker(
+        markerId: const MarkerId("ilk"),
+        position: const LatLng(
+          36.477638,
+          36.454552,
+        ),
+
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+
+      Marker(
+        markerId: const MarkerId("iki"),
+        position: const LatLng(
+          36.477638,
+          36.454999,
+        ),
+
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+
+      Marker(
+        markerId: const MarkerId("uc"),
+        position: const LatLng(
+          36.477999,
+          36.454999,
+        ),
+
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ),
+    };
+  }
 
   static const CameraPosition _kLake = CameraPosition(
     bearing: 192.8334901395799,
-    target: LatLng(37.43296265331129, -122.08832357078792),
+    target: LatLng(
+      36.477638,
+      36.454552,
+    ),
     tilt: 59.440717697143555,
     zoom: 19.151926040649414
   );
@@ -52,7 +86,9 @@ class _HaritaState extends State<Harita> {
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
             },
-      
+
+           markers: isaretler(),
+           
           
           ),
 
@@ -60,11 +96,12 @@ class _HaritaState extends State<Harita> {
             child: Padding(
               
               padding: const EdgeInsets.all(8.0),
-              child: CupertinoTextField(
+              child: CupertinoSearchTextField(
                 placeholder: "Ara...",
-                prefix: Icon(
-                  CupertinoIcons.search,
-                  color: CupertinoColors.systemGrey,
+                prefixInsets: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10)
                 ),
                 
               ),
