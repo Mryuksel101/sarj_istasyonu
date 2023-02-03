@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
+
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ class Harita extends StatefulWidget {
 }
 
 class _HaritaState extends State<Harita> {
-  late TextEditingController textEditingController;
+
   double lat = 0;
   double long = 0;
   Map <String, dynamic> myMap = {};
@@ -25,7 +27,7 @@ class _HaritaState extends State<Harita> {
   }
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
-
+  
 
   void sehirTahmini(String inputx) async{ // yer tahminini ve onun idsi yer alıyor
     String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
@@ -39,22 +41,25 @@ class _HaritaState extends State<Harita> {
   }
 
   String yerId(int index){
-    return myMap ["predictions"][index]["place_id"];
+    debugPrint("yer id");
+    debugPrint(myMap ["predictions"][index]["place_id"].toString());
+    return myMap["predictions"][index]["place_id"];
   }
 
   void latLongAl(int index) async{
-    
+    debugPrint("bura");
     String baseUrl = "https://maps.googleapis.com/maps/api/place/details/json?";
     String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
     String place_id = yerId(index);
     String url = "${baseUrl}&key=$apiKey&place_id=$place_id";
-
+    debugPrint("am");
     Response response = await get(Uri.parse(url));
-    myMap = jsonDecode(response.body);
+    Map<String, dynamic> myMap2 = jsonDecode(response.body);
     
-    lat = myMap["result"]["geometry"]["location"]["lat"];
-    long =  myMap["result"]["geometry"]["location"]["lng"];
+    lat = myMap2["result"]["geometry"]["location"]["lat"];
+    long =  myMap2["result"]["geometry"]["location"]["lng"];
 
+    log("secilen long: $long. seçilen lang: $lat");
   }
 
   Future<void> _search(double lat, double lng) async {
@@ -160,6 +165,7 @@ class _HaritaState extends State<Harita> {
                 
                 children: [
                   CupertinoSearchTextField(
+                    
                     onChanged: (value) {
                       debugPrint(value);
                       sehirTahmini(value);
@@ -168,7 +174,7 @@ class _HaritaState extends State<Harita> {
                         
                       });
                     },
-                    controller: textEditingController,
+                
                     placeholder: "Ara...",
                     prefixInsets: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
@@ -180,7 +186,7 @@ class _HaritaState extends State<Harita> {
 
                   
                   Container(
-                    margin: EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(top: 5),
                     padding: EdgeInsets.all(10),
                     height: myMap.length * 90,
                     decoration: BoxDecoration(
@@ -192,6 +198,8 @@ class _HaritaState extends State<Harita> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
+                            debugPrint(myMap.toString());
+                           debugPrint( myMap ["predictions"][index]["place_id"].toString());
                             latLongAl(index);
                             _search(lat,long);
                             debugPrint(index.toString());
