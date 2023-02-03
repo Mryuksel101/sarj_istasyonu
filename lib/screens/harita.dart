@@ -15,6 +15,8 @@ class Harita extends StatefulWidget {
 
 class _HaritaState extends State<Harita> {
   late TextEditingController textEditingController;
+  double lat = 0;
+  double long = 0;
   Map <String, dynamic> myMap = {};
   
   void initState() {
@@ -39,7 +41,7 @@ class _HaritaState extends State<Harita> {
 
 
 
-  void sehirTahmini(String inputx) async{ 
+  void sehirTahmini(String inputx) async{ // yer önerisi ve onun idsi yer alıyor
     String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
     String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
     String input = inputx;
@@ -48,6 +50,40 @@ class _HaritaState extends State<Harita> {
     Response response = await get(Uri.parse(url));
     myMap = jsonDecode(response.body);
 
+  }
+
+  String yerId(int index){
+    return myMap ["predictions"][index]["place_id"];
+  }
+
+  void latLongAl(int index) async{
+    
+    String baseUrl = "https://maps.googleapis.com/maps/api/place/details/json?";
+    String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
+    String place_id = yerId(index);
+    String url = "${baseUrl}&key=$apiKey&place_id=$place_id";
+
+    Response response = await get(Uri.parse(url));
+    myMap = jsonDecode(response.body);
+    debugPrint(myMap.toString());
+
+  }
+
+  Future<void> _search(double lat, double lng) async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 192.8334901395799,
+          target: LatLng(
+            lat,
+            lng,
+          ),
+          tilt: 59.440717697143555,
+          zoom: 19.151926040649414
+        )
+      )
+    );
   }
 
   
@@ -102,6 +138,8 @@ class _HaritaState extends State<Harita> {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
+
+
   @override
   Widget build(BuildContext context) {
     debugPrint("harita yüklendi");
@@ -113,6 +151,7 @@ class _HaritaState extends State<Harita> {
 
           
           GoogleMap(
+            
             trafficEnabled: true,
             mapType: MapType.normal,
             initialCameraPosition: _kLake,
@@ -156,7 +195,20 @@ class _HaritaState extends State<Harita> {
                     child: ListView.builder(
                       itemCount: myMap.length,
                       itemBuilder: (context, index) {
-                        return Text(myMap["predictions"][index]["description"]);
+                        return GestureDetector(
+                          onTap: () {
+                            latLongAl(index);
+                            
+                            debugPrint("map neymiş: $myMap");
+                            
+                          },
+                          child: Text(
+                            myMap["predictions"][index]["description"],
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          )
+                        );
                       },
                     ),
                   ),
