@@ -22,26 +22,12 @@ class _HaritaState extends State<Harita> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    textEditingController = TextEditingController();
-    textEditingController.addListener(
-      () {
-
-        debugPrint("cümle değişti");
-        debugPrint(textEditingController.text);
-        sehirTahmini(textEditingController.text);
-        setState(() {
-          
-        });
-      },
-    );
-    debugPrint("init");
-
   }
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
 
 
-  void sehirTahmini(String inputx) async{ // yer önerisi ve onun idsi yer alıyor
+  void sehirTahmini(String inputx) async{ // yer tahminini ve onun idsi yer alıyor
     String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
     String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
     String input = inputx;
@@ -174,7 +160,14 @@ class _HaritaState extends State<Harita> {
                 
                 children: [
                   CupertinoSearchTextField(
-
+                    onChanged: (value) {
+                      debugPrint(value);
+                      sehirTahmini(value);
+                      debugPrint("değişti: $myMap");
+                      setState(() {
+                        
+                      });
+                    },
                     controller: textEditingController,
                     placeholder: "Ara...",
                     prefixInsets: const EdgeInsets.all(5),
@@ -189,19 +182,18 @@ class _HaritaState extends State<Harita> {
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     padding: EdgeInsets.all(10),
-                    height: myMap.length * 40,
+                    height: myMap.length * 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       color: Colors.white,
                     ),
-                    child: ListView.builder(
+                    child: myMap.length!=0? ListView.builder(
                       itemCount: myMap.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             latLongAl(index);
                             _search(lat,long);
-                            debugPrint("map neymiş: $myMap");
                             debugPrint(index.toString());
                             
                           },
@@ -213,7 +205,7 @@ class _HaritaState extends State<Harita> {
                           )
                         );
                       },
-                    ),
+                    ):const SizedBox(),
                   ),
 
                   
