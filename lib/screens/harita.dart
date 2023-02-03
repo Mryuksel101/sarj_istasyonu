@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
+import 'package:sarj_istasyonu/main.dart';
 class Harita extends StatefulWidget {
   const Harita({Key? key}) : super(key: key);
 
@@ -14,13 +15,21 @@ class Harita extends StatefulWidget {
 
 class _HaritaState extends State<Harita> {
   late TextEditingController textEditingController;
+  Map <String, dynamic> myMap = {};
+  
   void initState() {
     // TODO: implement initState
     super.initState();
     textEditingController = TextEditingController();
     textEditingController.addListener(
       () {
+
         debugPrint("cümle değişti");
+        debugPrint(textEditingController.text);
+        sehirTahmini(textEditingController.text);
+        setState(() {
+          
+        });
       },
     );
     debugPrint("init");
@@ -30,14 +39,14 @@ class _HaritaState extends State<Harita> {
 
 
 
-  void sehirTahmini() async{ 
+  void sehirTahmini(String inputx) async{ 
     String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
     String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
-    String input = "ant";
+    String input = inputx;
     String components ="country:tr";
     String url = "${baseUrl}input=$input&key=$apiKey&components=$components";
     Response response = await get(Uri.parse(url));
-    Map <String, dynamic> myMap = jsonDecode(response.body);
+    myMap = jsonDecode(response.body);
 
   }
 
@@ -97,18 +106,14 @@ class _HaritaState extends State<Harita> {
   Widget build(BuildContext context) {
     debugPrint("harita yüklendi");
     return Scaffold(
-      floatingActionButton: TextButton(
-        onPressed: () {
-          sehirTahmini();
-        },
-        child: Text("bas"),
-      ),
+      
       body: Stack(
 
         children: [
 
           
           GoogleMap(
+            trafficEnabled: true,
             mapType: MapType.normal,
             initialCameraPosition: _kLake,
             onMapCreated: (GoogleMapController controller) {
@@ -124,18 +129,44 @@ class _HaritaState extends State<Harita> {
             child: Padding(
               
               padding: const EdgeInsets.all(8.0),
-              child: CupertinoSearchTextField(
-                controller: textEditingController,
-                placeholder: "Ara...",
-                prefixInsets: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10)
-                ),
+              child: Column(
                 
+                children: [
+                  CupertinoSearchTextField(
+
+                    controller: textEditingController,
+                    placeholder: "Ara...",
+                    prefixInsets: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    
+                  ),
+
+                  
+                  Container(
+                    margin: EdgeInsets.only(top: 5),
+                    padding: EdgeInsets.all(10),
+                    height: myMap.length * 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white,
+                    ),
+                    child: ListView.builder(
+                      itemCount: myMap.length,
+                      itemBuilder: (context, index) {
+                        return Text(myMap["predictions"][index]["description"]);
+                      },
+                    ),
+                  ),
+
+                  
+                  
+                ],
               ),
             ),
-          )
+          ),  
         ],
       ),
       
