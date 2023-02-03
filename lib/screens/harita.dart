@@ -202,6 +202,7 @@ class _HaritaState extends State<Harita> {
                             latLongAl(index);
                             _search(lat,long);
                             debugPrint("map neymiş: $myMap");
+                            debugPrint(index.toString());
                             
                           },
                           child: Text(
