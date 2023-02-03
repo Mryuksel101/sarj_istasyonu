@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:http/http.dart';
 class Harita extends StatefulWidget {
   const Harita({Key? key}) : super(key: key);
 
@@ -12,13 +13,33 @@ class Harita extends StatefulWidget {
 }
 
 class _HaritaState extends State<Harita> {
-  @override
+  late TextEditingController textEditingController;
   void initState() {
     // TODO: implement initState
     super.initState();
+    textEditingController = TextEditingController();
+    textEditingController.addListener(
+      () {
+        debugPrint("cümle değişti");
+      },
+    );
     debugPrint("init");
+
   }
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+
+
+
+  void sehirTahmini() async{ 
+    String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
+    String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
+    String input = "ant";
+    String components ="country:tr";
+    String url = "${baseUrl}input=$input&key=$apiKey&components=$components";
+    Response response = await get(Uri.parse(url));
+    Map <String, dynamic> myMap = jsonDecode(response.body);
+
+  }
 
   
 
@@ -66,6 +87,8 @@ class _HaritaState extends State<Harita> {
     zoom: 19.151926040649414
   );
 
+
+
   Future<void> _goToTheLake() async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
@@ -74,7 +97,12 @@ class _HaritaState extends State<Harita> {
   Widget build(BuildContext context) {
     debugPrint("harita yüklendi");
     return Scaffold(
-      
+      floatingActionButton: TextButton(
+        onPressed: () {
+          sehirTahmini();
+        },
+        child: Text("bas"),
+      ),
       body: Stack(
 
         children: [
@@ -97,6 +125,7 @@ class _HaritaState extends State<Harita> {
               
               padding: const EdgeInsets.all(8.0),
               child: CupertinoSearchTextField(
+                controller: textEditingController,
                 placeholder: "Ara...",
                 prefixInsets: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
