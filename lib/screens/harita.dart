@@ -65,7 +65,9 @@ class _HaritaState extends State<Harita> {
 
     Response response = await get(Uri.parse(url));
     myMap = jsonDecode(response.body);
-    debugPrint(myMap.toString());
+    
+    lat = myMap["result"]["geometry"]["location"]["lat"];
+    long =  myMap["result"]["geometry"]["location"]["lng"];
 
   }
 
@@ -198,7 +200,7 @@ class _HaritaState extends State<Harita> {
                         return GestureDetector(
                           onTap: () {
                             latLongAl(index);
-                            
+                            _search(lat,long);
                             debugPrint("map neymiş: $myMap");
                             
                           },
