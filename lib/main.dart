@@ -17,6 +17,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     debugPrint("deneme");
     return const MaterialApp(
+
       debugShowCheckedModeBanner: false,
       home: Harita(),
     );
