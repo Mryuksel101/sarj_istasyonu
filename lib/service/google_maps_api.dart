@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 
@@ -59,7 +60,7 @@ class HaritalarApi{
     lat = myMap2["result"]["geometry"]["location"]["lat"];
     long =  myMap2["result"]["geometry"]["location"]["lng"];
 
- 
+    log("lat long alındı kanka. $lat $long");
   }
 
   static void controllerCopmplate(var c){

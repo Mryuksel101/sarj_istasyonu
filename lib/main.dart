@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sarj_istasyonu/screens/harita.dart';
+import 'package:sarj_istasyonu/view/screens/harita.dart';
 
 void main(List<String> args) {
   runApp(const MyApp());
