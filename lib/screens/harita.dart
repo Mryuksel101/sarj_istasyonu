@@ -1,13 +1,11 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
+
 
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart';
-import 'package:sarj_istasyonu/main.dart';
+
+import '../service/google_maps_api.dart';
 class Harita extends StatefulWidget {
   const Harita({Key? key}) : super(key: key);
 
@@ -17,69 +15,10 @@ class Harita extends StatefulWidget {
 
 class _HaritaState extends State<Harita> {
 
-  double lat = 0;
-  double long = 0;
-  Map <String, dynamic> myMap = {};
-  
   void initState() {
     // TODO: implement initState
     super.initState();
   }
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-
-  
-
-  void sehirTahmini(String inputx) async{ // yer tahminini ve onun idsi yer alıyor
-    String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-    String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
-    String input = inputx;
-    String components ="country:tr";
-    String url = "${baseUrl}input=$input&key=$apiKey&components=$components";
-    Response response = await get(Uri.parse(url));
-    myMap = jsonDecode(response.body);
-
-  }
-
-  String yerId(int index){
-    debugPrint("yer id");
-    debugPrint(myMap ["predictions"][index]["place_id"].toString());
-    return myMap["predictions"][index]["place_id"];
-  }
-
-  void latLongAl(int index) async{
-    debugPrint("bura");
-    String baseUrl = "https://maps.googleapis.com/maps/api/place/details/json?";
-    String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
-    String place_id = yerId(index);
-    String url = "${baseUrl}&key=$apiKey&place_id=$place_id";
-    debugPrint("am");
-    Response response = await get(Uri.parse(url));
-    Map<String, dynamic> myMap2 = jsonDecode(response.body);
-    
-    lat = myMap2["result"]["geometry"]["location"]["lat"];
-    long =  myMap2["result"]["geometry"]["location"]["lng"];
-
-    log("secilen long: $long. seçilen lang: $lat");
-  }
-
-  Future<void> _search(double lat, double lng) async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          bearing: 192.8334901395799,
-          target: LatLng(
-            lat,
-            lng,
-          ),
-          tilt: 59.440717697143555,
-          zoom: 19.151926040649414
-        )
-      )
-    );
-  }
-
-  
 
   Set<Marker> isaretler(){
     return <Marker>{
@@ -115,22 +54,11 @@ class _HaritaState extends State<Harita> {
     };
   }
 
-  static const CameraPosition _kLake = CameraPosition(
-    bearing: 192.8334901395799,
-    target: LatLng(
-      36.477638,
-      36.454552,
-    ),
-    tilt: 59.440717697143555,
-    zoom: 19.151926040649414
-  );
+  
 
 
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-  }
+  
 
 
   @override
@@ -147,9 +75,9 @@ class _HaritaState extends State<Harita> {
             
             trafficEnabled: true,
             mapType: MapType.normal,
-            initialCameraPosition: _kLake,
+            initialCameraPosition: HaritalarApi.kLake,
             onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
+              HaritalarApi.controllerCopmplate(controller);
             },
 
            markers: isaretler(),
@@ -167,12 +95,14 @@ class _HaritaState extends State<Harita> {
                   CupertinoSearchTextField(
                     
                     onChanged: (value) {
-                      debugPrint(value);
-                      sehirTahmini(value);
-                      debugPrint("değişti: $myMap");
-                      setState(() {
+                      if(value.isNotEmpty){
+                        HaritalarApi.sehirTahmini(value);
+                        setState(() {
                         
-                      });
+                        });
+                      }
+                      
+                      
                     },
                 
                     placeholder: "Ara...",
@@ -187,27 +117,27 @@ class _HaritaState extends State<Harita> {
                   
                   Container(
                     margin: const EdgeInsets.only(top: 5),
-                    padding: EdgeInsets.all(10),
-                    height: myMap.length * 90,
+                    padding: const EdgeInsets.all(10),
+                    height: HaritalarApi.myMap.length * 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       color: Colors.white,
                     ),
-                    child: myMap.length!=0? ListView.builder(
-                      itemCount: myMap.length,
+                    child: HaritalarApi.myMap.isNotEmpty? ListView.builder(
+                      itemCount: HaritalarApi.myMap.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            debugPrint(myMap.toString());
-                           debugPrint( myMap ["predictions"][index]["place_id"].toString());
-                            latLongAl(index);
-                            _search(lat,long);
+                            debugPrint("kanka $index");
+                           debugPrint( HaritalarApi.myMap ["predictions"][index]["place_id"].toString());
+                            HaritalarApi.latLongAl(index);
+                            HaritalarApi.search(HaritalarApi.lat,HaritalarApi.long);
                             debugPrint(index.toString());
                             
                           },
                           child: Text(
-                            myMap["predictions"][index]["description"],
-                            style: TextStyle(
+                            HaritalarApi.myMap["predictions"][index]["description"],
+                            style: const TextStyle(
                               fontSize: 20,
                             ),
                           )
