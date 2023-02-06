@@ -6,11 +6,11 @@ import 'package:http/http.dart';
 
 class HaritalarApi{
   static Map <String, dynamic> myMap = {};
-  static double lat = 0;
-  static double long = 0;
+
 
   
   static Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  
   static Future<void> search(double lat, double lng) async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(
@@ -57,10 +57,11 @@ class HaritalarApi{
 
     
     
-    lat = myMap2["result"]["geometry"]["location"]["lat"];
-    long =  myMap2["result"]["geometry"]["location"]["lng"];
+    double lat = myMap2["result"]["geometry"]["location"]["lat"];
+    double long =  myMap2["result"]["geometry"]["location"]["lng"];
 
-    log("lat long alındı kanka. $lat $long");
+    
+    HaritalarApi.search(lat,long);
   }
 
   static void controllerCopmplate(var c){

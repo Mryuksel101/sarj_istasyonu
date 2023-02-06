@@ -24,6 +24,7 @@ class _OnerilenSehirlerState extends State<OnerilenSehirler> {
             onChanged: (value) {
               if(value.isNotEmpty){
                 HaritalarApi.sehirTahmini(value);
+          
                 setState(() {
                 
                 });
@@ -56,8 +57,7 @@ class _OnerilenSehirlerState extends State<OnerilenSehirler> {
                       debugPrint("kanka $index");
                       debugPrint( HaritalarApi.myMap ["predictions"][index]["place_id"].toString());
                       HaritalarApi.latLongAl(index);
-                      HaritalarApi.search(HaritalarApi.lat,HaritalarApi.long);
-                      debugPrint(index.toString());
+                      
                       
                     },
                     child: Text(
