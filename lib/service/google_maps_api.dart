@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 
 class HaritalarApi{
-  static Map <String, dynamic> myMap = {};
+  static Map myMap = {};
 
 
   
@@ -30,14 +30,17 @@ class HaritalarApi{
 
 
 
-  static void sehirTahmini(String inputx) async{ // yer tahminini ve onun idsi yer alıyor
+  static Future<Map> sehirTahmini(String inputx) async{ // response'da yer tahminini ve onun idsi yer alıyor
     String baseUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
     String apiKey = "AIzaSyCIKio0UF1xUXL_GvBhOCGV274SZUNNhos";
     String input = inputx;
     String components ="country:tr";
     String url = "${baseUrl}input=$input&key=$apiKey&components=$components";
-    var response = await get(Uri.parse(url));
+    Response response = await get(Uri.parse(url));
     myMap = jsonDecode(response.body);
+    return myMap;
+
+    
   }
 
   static String yerId(int index){

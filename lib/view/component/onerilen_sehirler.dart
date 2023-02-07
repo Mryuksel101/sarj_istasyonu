@@ -11,6 +11,7 @@ class OnerilenSehirler extends StatefulWidget {
 }
 
 class _OnerilenSehirlerState extends State<OnerilenSehirler> {
+  String tahmin = "";
   @override
   Widget build(BuildContext context) {
     debugPrint("OnerilenSehirler buildi");
@@ -23,11 +24,13 @@ class _OnerilenSehirlerState extends State<OnerilenSehirler> {
             
             onChanged: (value) {
               if(value.isNotEmpty){
-                HaritalarApi.sehirTahmini(value);
-          
+                tahmin = value;
+                debugPrint("$value yazildi");
+
                 setState(() {
-                
+                  
                 });
+               
               }
               
               
@@ -41,34 +44,38 @@ class _OnerilenSehirlerState extends State<OnerilenSehirler> {
             ),
             
           ),
-            Container(
-              margin: const EdgeInsets.only(top: 5),
-              padding: const EdgeInsets.all(10),
-              height: HaritalarApi.myMap.length * 90,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.white,
+            FutureBuilder(
+              future: HaritalarApi.sehirTahmini(tahmin),
+              builder: (context, snapshot) => Container(
+                margin: const EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.all(10),
+                height: snapshot.data!.length* 90,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white,
+                ),
+                child: ListView.builder(
+                  itemCount: HaritalarApi.myMap.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        debugPrint("kanka $index");
+                        debugPrint(snapshot.data!["predictions"][index]["place_id"].toString());
+                        HaritalarApi.latLongAl(index);
+                        
+                        
+                      },
+                      child: Text(
+                        snapshot.data!["predictions"][index]["description"],
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
+                      )
+                    );
+                  },
+                ),
               ),
-              child: ListView.builder(
-                itemCount: HaritalarApi.myMap.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      debugPrint("kanka $index");
-                      debugPrint( HaritalarApi.myMap ["predictions"][index]["place_id"].toString());
-                      HaritalarApi.latLongAl(index);
-                      
-                      
-                    },
-                    child: Text(
-                      HaritalarApi.myMap["predictions"][index]["description"],
-                      style: const TextStyle(
-                        fontSize: 20,
-                      ),
-                    )
-                  );
-                },
-              ),
+            
             ),
           ],
         ),
